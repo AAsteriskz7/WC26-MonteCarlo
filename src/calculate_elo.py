@@ -9,16 +9,38 @@ DATA_DIR = BASE_DIR / 'data' / 'processed'
 # K factor is the importance weight of a specific math, allows us to change ELO based on K value. 
 
 def calculate_k_factor(tournament_name):
-    if "World Cup" in tournament_name and "Qualifier" not in tournament_name and "Qualification" not in tournament_name:
-        return 60
-    elif any(cup in tournament_name for cup in ["Copa América", "Euro", "African Cup of Nations", "Gold Cup", "Asian Cup"]):
-        return 40
-    elif "Qualifier" in tournament_name or "Qualification" in tournament_name:
+    name_lower = tournament_name.lower()
+    
+    # 1. Tier 3 - Qualifiers (Checked first to prevent qualifier matching majors)
+    if "qualif" in name_lower:
         return 30
-    elif "Friendly" in tournament_name:
+        
+    # 2. Tier 1 - FIFA World Cup Finals (excludes non-FIFA variants like Viva World Cup)
+    elif "fifa world cup" in name_lower:
+        return 60
+        
+    # 3. Tier 2 - Continental Majors & Official Confederation Tournaments
+    elif any(cup in name_lower for cup in [
+        "copa américa", "copa america", "uefa euro", 
+        "african cup of nations", "asian cup", "gold cup", 
+        "concacaf championship", "confederations cup", 
+        "oceania nations cup", "aff championship", 
+        "waff championship", "eaff championship",
+        "nations league", "arab cup",
+        "cosafa cup", "saff championship", "cecafa cup",
+        "asean championship"
+    ]):
+        return 40
+        
+    # 4. Tier 5 - Friendlies
+    elif "friendly" in name_lower:
         return 10
+        
+    # 5. Tier 4 - Default Competitive Fallback
     else:
         return 20
+
+
 
 
 # 3. Expected Score (Probability) Calculator
