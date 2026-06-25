@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import pandas as pd
 
-raw_dir = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo/data/raw/squads")
+raw_dir = Path("/app/data/raw/squads")
 goalkeepers = []
 
 for file_path in raw_dir.glob("*.json"):
@@ -38,7 +38,7 @@ for file_path in raw_dir.glob("*.json"):
 
 df_gks = pd.DataFrame(gk_candidates)
 # Save to file to avoid encoding issues
-out_path = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo/scratch/goalkeepers.txt")
+out_path = Path("/app/scratch/goalkeepers.txt")
 with open(out_path, "w", encoding="utf-8") as out:
     for idx, row in df_gks.iterrows():
         out.write(f"{row['team']}: {row['name']} (€{row['value']}m)\n")

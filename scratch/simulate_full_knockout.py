@@ -4,7 +4,7 @@ import joblib
 from pathlib import Path
 import random
 
-BASE_DIR = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo")
+BASE_DIR = Path("/app")
 MODEL_DIR = BASE_DIR / 'data' / 'models'
 DATA_DIR = BASE_DIR / 'data' / 'processed'
 

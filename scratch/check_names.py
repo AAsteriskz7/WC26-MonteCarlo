@@ -3,7 +3,7 @@ import numpy as np
 import joblib
 from pathlib import Path
 
-BASE_DIR = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo")
+BASE_DIR = Path("/app")
 MODEL_DIR = BASE_DIR / 'data' / 'models'
 DATA_DIR = BASE_DIR / 'data' / 'processed'
 
