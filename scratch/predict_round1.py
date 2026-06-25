@@ -4,7 +4,7 @@ import joblib
 from pathlib import Path
 from scipy.stats import poisson
 
-BASE_DIR = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo")
+BASE_DIR = Path("/app")
 MODEL_DIR = BASE_DIR / 'data' / 'models'
 DATA_DIR = BASE_DIR / 'data' / 'processed'
 
@@ -151,7 +151,7 @@ round1_matches = [
     ('POR', 'COD'), ('ENG', 'CRO'), ('GHA', 'PAN'), ('UZB', 'COL')
 ]
 
-out_path = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo/scratch/round1_predictions.txt")
+out_path = Path("/app/scratch/round1_predictions.txt")
 with open(out_path, "w", encoding="utf-8") as out:
     for t1, t2 in round1_matches:
         best, exp = predict_score(t1, t2)

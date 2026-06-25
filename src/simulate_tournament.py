@@ -19,11 +19,11 @@ away_model = joblib.load(MODEL_DIR / 'away_poisson.pkl')
 HOSTS = ['United States', 'Mexico', 'Canada']
 
 GROUPS = {
-    'A': ['Mexico', 'South Africa', 'South Korea', 'Czechia'],
+    'A': ['Mexico', 'South Africa', 'South Korea', 'Czech Republic'],
     'B': ['Canada', 'Bosnia and Herzegovina', 'Qatar', 'Switzerland'],
     'C': ['Brazil', 'Morocco', 'Haiti', 'Scotland'],
     'D': ['United States', 'Paraguay', 'Australia', 'Turkey'],
-    'E': ['Germany', 'Curacao', 'Ivory Coast', 'Ecuador'],
+    'E': ['Germany', 'Curaçao', 'Ivory Coast', 'Ecuador'],
     'F': ['Netherlands', 'Japan', 'Sweden', 'Tunisia'],
     'G': ['Belgium', 'Egypt', 'Iran', 'New Zealand'],
     'H': ['Spain', 'Cape Verde', 'Saudi Arabia', 'Uruguay'],

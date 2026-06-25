@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import pandas as pd
 
-raw_dir = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo/data/raw/squads")
+raw_dir = Path("/app/data/raw/squads")
 all_players = []
 
 for file_path in raw_dir.glob("*.json"):
@@ -21,7 +21,7 @@ for file_path in raw_dir.glob("*.json"):
 df_players = pd.DataFrame(all_players)
 top_players = df_players.sort_values(by="value_eur_million", ascending=False).head(100)
 
-out_path = Path("c:/Users/avsad/Storage/Programming/Projects/WC26-MonteCarlo/scratch/top_players.txt")
+out_path = Path("/app/scratch/top_players.txt")
 with open(out_path, "w", encoding="utf-8") as out:
     for idx, row in top_players.iterrows():
         out.write(f"{row['name']} ({row['team']}): €{row['value_eur_million']}m\n")
