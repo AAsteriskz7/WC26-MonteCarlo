@@ -53,7 +53,6 @@ DATA_DIR = BASE_DIR / 'data' / 'processed'
 MODEL_DIR = BASE_DIR / 'data' / 'models'
 
 # 1. Cached Data Loading
-@st.cache_data
 def load_data():
     # Load processed ELO results
     df_elo = pd.read_csv(DATA_DIR / 'elo_results.csv', parse_dates=['date'])
