@@ -42,6 +42,8 @@ def get_mvi_name(name):
         return 'Türkiye'
     if name == 'South Korea':
         return 'Korea Republic'
+    if name == 'Ivory Coast':
+        return "Côte d'Ivoire"
     return name
 
 def simulate_match(team1, team2, is_knockout=True):
@@ -80,9 +82,8 @@ def simulate_match(team1, team2, is_knockout=True):
         return score2, score1
     return score1, score2
 
-def get_probability_winner(t1, t2):
+def get_probability_winner(t1, t2, runs=10000):
     t1_wins = 0
-    runs = 10000
     for _ in range(runs):
         s1, s2 = simulate_match(t1, t2, is_knockout=True)
         if s1 > s2:
@@ -100,84 +101,153 @@ names_to_abbrev = {
     'Brazil': 'BRA', 'Sweden': 'SWE', 'Ivory Coast': 'CIV', 'Norway': 'NOR',
     'Mexico': 'MEX', 'Scotland': 'SCO', 'England': 'ENG', 'DR Congo': 'COD',
     'Argentina': 'ARG', 'Uruguay': 'URU', 'United States': 'USA', 'Egypt': 'EGY',
-    'Switzerland': 'SUI', 'Algeria': 'ALG', 'Portugal': 'POR', 'Senegal': 'SEN'
+    'Switzerland': 'SUI', 'Algeria': 'ALG', 'Portugal': 'POR', 'Senegal': 'SEN',
+    'South Africa': 'RSA', 'Bosnia and Herzegovina': 'BIH', 'Cape Verde': 'CPV',
+    'Australia': 'AUS', 'Ghana': 'GHA', 'Senegal': 'SEN'
 }
 
-# 1. R32 Matches
-r32_matches = [
-    ('Germany', 'Paraguay'),
-    ('France', 'Japan'),
-    ('Czechia', 'Canada'),
-    ('Netherlands', 'Morocco'),
-    ('Colombia', 'Croatia'),
-    ('Spain', 'Austria'),
-    ('Turkey', 'Ecuador'),
-    ('Belgium', 'South Korea'),
-    ('Brazil', 'Sweden'),
-    ('Ivory Coast', 'Norway'),
-    ('Mexico', 'Scotland'),
-    ('England', 'DR Congo'),
-    ('Argentina', 'Uruguay'),
-    ('United States', 'Egypt'),
-    ('Switzerland', 'Algeria'),
-    ('Portugal', 'Senegal')
+def abbrev(name):
+    return names_to_abbrev.get(name, name[:3].upper())
+
+# ============================================================
+# ROUND OF 32 - REAL RESULTS (June 28 - July 3, 2026)
+# ============================================================
+print("=" * 55)
+print("  2026 FIFA WORLD CUP - KNOCKOUT STAGE TRACKER")
+print("=" * 55)
+print()
+print("--- ROUND OF 32 (REAL RESULTS) ---")
+
+r32_results = [
+    # (home, away, home_score, away_score, notes, winner)
+    ('Canada',         'South Africa',          1, 0, '',          'Canada'),
+    ('Brazil',         'Japan',                 2, 1, '',          'Brazil'),
+    ('Paraguay',       'Germany',               1, 1, 'Pens 4-3', 'Paraguay'),
+    ('Morocco',        'Netherlands',           1, 1, 'Pens 3-2', 'Morocco'),
+    ('Norway',         'Ivory Coast',           2, 1, '',          'Norway'),
+    ('France',         'Sweden',                3, 0, '',          'France'),
+    ('Mexico',         'Ecuador',               2, 0, '',          'Mexico'),
+    ('England',        'DR Congo',              2, 1, '',          'England'),
+    ('Belgium',        'Senegal',               3, 2, 'AET',       'Belgium'),
+    ('United States',  'Bosnia and Herzegovina',2, 0, '',          'United States'),
+    ('Spain',          'Austria',               3, 0, '',          'Spain'),
+    ('Portugal',       'Croatia',               2, 1, '',          'Portugal'),
+    ('Switzerland',    'Algeria',               2, 0, '',          'Switzerland'),
+    ('Egypt',          'Australia',             1, 1, 'Pens 4-2', 'Egypt'),
+    ('Argentina',      'Cape Verde',            3, 2, 'AET',       'Argentina'),
+    ('Colombia',       'Ghana',                 1, 0, '',          'Colombia'),
 ]
 
-print("--- ROUND OF 32 EXPECTED WINNERS ---")
 r32_winners = []
-for t1, t2 in r32_matches:
-    w, p = get_probability_winner(t1, t2)
-    r32_winners.append(w)
-    print(f"{names_to_abbrev[t1]} vs {names_to_abbrev[t2]} -> {names_to_abbrev[w]} ({p*100:.1f}%)")
+for h, a, hs, as_, note, winner in r32_results:
+    note_str = f" ({note})" if note else ""
+    print(f"  {abbrev(h)} {hs}-{as_}{note_str} {abbrev(a)}  →  {abbrev(winner)}")
+    r32_winners.append(winner)
 
-# 2. R16 Matches
-r16_pairs = [
-    (r32_winners[0], r32_winners[1]), # GER vs FRA
-    (r32_winners[2], r32_winners[3]), # CAN vs NED
-    (r32_winners[4], r32_winners[5]), # COL vs ESP
-    (r32_winners[6], r32_winners[7]), # TUR vs BEL
-    (r32_winners[8], r32_winners[9]), # BRA vs NOR
-    (r32_winners[10], r32_winners[11]), # MEX vs ENG
-    (r32_winners[12], r32_winners[13]), # ARG vs USA
-    (r32_winners[14], r32_winners[15])  # SUI vs POR
+# R32 bracket pairing -> R16 matchups:
+# Canada vs South Africa winner  → vs → Brazil vs Japan winner        → Morocco vs NED winner
+# (Canada)                               (Brazil)                         (Morocco)
+# So actual R16 pairs based on bracket:
+# Slot 1: Canada vs Brazil  → BUT actual R16 is Morocco vs Canada, France vs Paraguay...
+# The ACTUAL R16 bracket (set by FIFA draw) was:
+#   Morocco vs Canada
+#   France vs Paraguay
+#   Norway vs Brazil
+#   England vs Mexico
+#   Spain vs Portugal       (July 6)
+#   USA vs Belgium          (July 6)
+#   Argentina vs Egypt      (July 7)
+#   Switzerland vs Colombia (July 7)
+
+# ============================================================
+# ROUND OF 16 - REAL RESULTS (July 4-5) + SIMULATED (July 6-7)
+# ============================================================
+print()
+print("--- ROUND OF 16 ---")
+
+# Confirmed R16 results
+r16_confirmed = {
+    ('Morocco',        'Canada'):       (3, 0, '', 'Morocco'),
+    ('France',         'Paraguay'):     (1, 0, '', 'France'),
+    ('Norway',         'Brazil'):       (2, 1, '', 'Norway'),
+    ('England',        'Mexico'):       (2, 0, '', 'England'),
+}
+
+# Remaining R16 to simulate
+r16_remaining = [
+    ('Spain',         'Portugal'),
+    ('United States', 'Belgium'),
+    ('Argentina',     'Egypt'),
+    ('Switzerland',   'Colombia'),
 ]
 
-print("\n--- ROUND OF 16 EXPECTED WINNERS ---")
 r16_winners = []
-for t1, t2 in r16_pairs:
+
+# Print confirmed results
+for (h, a), (hs, as_, note, winner) in r16_confirmed.items():
+    note_str = f" ({note})" if note else ""
+    tag = "[FINAL]"
+    print(f"  {tag} {abbrev(h)} {hs}-{as_}{note_str} {abbrev(a)}  →  {abbrev(winner)}")
+    r16_winners.append(winner)
+
+# Simulate remaining R16
+print()
+print("  [SIMULATED - not yet played]")
+for t1, t2 in r16_remaining:
     w, p = get_probability_winner(t1, t2)
     r16_winners.append(w)
-    print(f"{names_to_abbrev[t1]} vs {names_to_abbrev[t2]} -> {names_to_abbrev[w]} ({p*100:.1f}%)")
+    print(f"  [SIM]   {abbrev(t1)} vs {abbrev(t2)}  →  {abbrev(w)} ({p*100:.1f}%)")
 
-# 3. QF Matches
+# ============================================================
+# QUARTERFINALS
+# ============================================================
+print()
+print("--- QUARTERFINALS (SIMULATED) ---")
+
+# QF pairs from bracket:
+# Morocco vs France (both won their half of bracket side)
+# Norway vs England
+# Spain/Portugal winner vs USA/Belgium winner
+# Argentina/Egypt winner vs Switzerland/Colombia winner
 qf_pairs = [
-    (r16_winners[0], r16_winners[1]),
-    (r16_winners[2], r16_winners[3]),
-    (r16_winners[4], r16_winners[5]),
-    (r16_winners[6], r16_winners[7])
+    (r16_winners[0], r16_winners[1]),  # Morocco vs France
+    (r16_winners[2], r16_winners[3]),  # Norway vs England
+    (r16_winners[4], r16_winners[5]),  # Spain/Por vs USA/Bel
+    (r16_winners[6], r16_winners[7]),  # Arg/Egy vs Sui/Col
 ]
 
-print("\n--- QUARTERFINALS EXPECTED WINNERS ---")
 qf_winners = []
 for t1, t2 in qf_pairs:
     w, p = get_probability_winner(t1, t2)
     qf_winners.append(w)
-    print(f"{names_to_abbrev[t1]} vs {names_to_abbrev[t2]} -> {names_to_abbrev[w]} ({p*100:.1f}%)")
+    print(f"  {abbrev(t1)} vs {abbrev(t2)}  →  {abbrev(w)} ({p*100:.1f}%)")
 
-# 4. SF Matches
+# ============================================================
+# SEMIFINALS
+# ============================================================
+print()
+print("--- SEMIFINALS (SIMULATED) ---")
+
 sf_pairs = [
     (qf_winners[0], qf_winners[1]),
-    (qf_winners[2], qf_winners[3])
+    (qf_winners[2], qf_winners[3]),
 ]
 
-print("\n--- SEMIFINALS EXPECTED WINNERS ---")
 sf_winners = []
 for t1, t2 in sf_pairs:
     w, p = get_probability_winner(t1, t2)
     sf_winners.append(w)
-    print(f"{names_to_abbrev[t1]} vs {names_to_abbrev[t2]} -> {names_to_abbrev[w]} ({p*100:.1f}%)")
+    print(f"  {abbrev(t1)} vs {abbrev(t2)}  →  {abbrev(w)} ({p*100:.1f}%)")
 
-# 5. Final
+# ============================================================
+# FINAL
+# ============================================================
+print()
+print("--- FINAL (SIMULATED) ---")
 w, p = get_probability_winner(sf_winners[0], sf_winners[1])
-print("\n--- FINAL EXPECTED WINNER ---")
-print(f"{names_to_abbrev[sf_winners[0]]} vs {names_to_abbrev[sf_winners[1]]} -> {names_to_abbrev[w]} ({p*100:.1f}%)")
+print(f"  {abbrev(sf_winners[0])} vs {abbrev(sf_winners[1])}  →  🏆 {abbrev(w)} ({p*100:.1f}%)")
+
+print()
+print("=" * 55)
+print(f"  PREDICTED 2026 WORLD CUP WINNER: {w}")
+print("=" * 55)
