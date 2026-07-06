@@ -2,10 +2,10 @@
     "Group Stage": [
         "[Group A] Mexico 2 - 0 South Africa",
         "[Group A] Mexico 1 - 0 South Korea",
-        "[Group A] Mexico 6 - 0 Czechia",
+        "[Group A] Mexico 3 - 2 Czechia",
         "[Group A] South Africa 1 - 0 South Korea",
-        "[Group A] South Africa 3 - 1 Czechia",
-        "[Group A] South Korea 4 - 1 Czechia",
+        "[Group A] South Africa 2 - 0 Czechia",
+        "[Group A] South Korea 4 - 2 Czechia",
         "[Group B] Canada 1 - 1 Bosnia and Herzegovina",
         "[Group B] Canada 6 - 0 Qatar",
         "[Group B] Canada 1 - 2 Switzerland",
@@ -24,11 +24,11 @@
         "[Group D] Paraguay 0 - 0 Australia",
         "[Group D] Paraguay 1 - 0 Turkey",
         "[Group D] Australia 2 - 0 Turkey",
-        "[Group E] Germany 9 - 0 Curacao",
+        "[Group E] Germany 7 - 1 Curacao",
         "[Group E] Germany 2 - 1 Ivory Coast",
         "[Group E] Germany 1 - 2 Ecuador",
-        "[Group E] Curacao 0 - 2 Ivory Coast",
-        "[Group E] Curacao 1 - 2 Ecuador",
+        "[Group E] Curacao 0 - 3 Ivory Coast",
+        "[Group E] Curacao 1 - 4 Ecuador",
         "[Group E] Ivory Coast 1 - 0 Ecuador",
         "[Group F] Netherlands 2 - 2 Japan",
         "[Group F] Netherlands 5 - 1 Sweden",
@@ -56,20 +56,20 @@
         "[Group I] Iraq 1 - 4 Norway",
         "[Group J] Argentina 3 - 0 Algeria",
         "[Group J] Argentina 2 - 0 Austria",
-        "[Group J] Argentina 0 - 0 Jordan",
-        "[Group J] Algeria 0 - 0 Austria",
+        "[Group J] Argentina 3 - 1 Jordan",
+        "[Group J] Algeria 3 - 3 Austria",
         "[Group J] Algeria 2 - 1 Jordan",
         "[Group J] Austria 3 - 1 Jordan",
         "[Group K] Portugal 1 - 1 DR Congo",
         "[Group K] Portugal 5 - 0 Uzbekistan",
         "[Group K] Portugal 0 - 0 Colombia",
-        "[Group K] DR Congo 0 - 0 Uzbekistan",
+        "[Group K] DR Congo 3 - 1 Uzbekistan",
         "[Group K] DR Congo 0 - 1 Colombia",
         "[Group K] Uzbekistan 1 - 3 Colombia",
         "[Group L] England 4 - 2 Croatia",
         "[Group L] England 0 - 0 Ghana",
-        "[Group L] England 0 - 0 Panama",
-        "[Group L] Croatia 0 - 0 Ghana",
+        "[Group L] England 2 - 0 Panama",
+        "[Group L] Croatia 2 - 1 Ghana",
         "[Group L] Croatia 1 - 0 Panama",
         "[Group L] Ghana 1 - 0 Panama"
     ],
@@ -97,21 +97,21 @@
         "Norway 2 - 1 Brazil",
         "England 2 - 0 Mexico",
         "Spain 2 - 1 Portugal",
-        "United States 1 - 2 Belgium",
-        "Argentina 2 - 1 Egypt",
-        "Switzerland 0 - 2 Colombia"
+        "United States 4 - 0 Belgium",
+        "Argentina 2 - 3 Egypt",
+        "Switzerland 3 - 4 Colombia"
     ],
     "Quarterfinals": [
-        "Morocco 2 - 1 France",
-        "Norway 0 - 3 England",
-        "Spain 4 - 2 Belgium",
-        "Argentina 2 - 3 Colombia"
+        "Morocco 0 - 2 France",
+        "Norway 1 - 2 England",
+        "Spain 2 - 1 United States",
+        "Egypt 2 - 1 Colombia"
     ],
     "Semifinals": [
-        "Morocco 1 - 2 England",
-        "Spain 0 - 1 Colombia"
+        "France 3 - 1 England",
+        "Spain 6 - 2 Egypt"
     ],
     "Final": [
-        "England 4 - 0 Colombia"
+        "France 3 - 1 Spain"
     ]
 }

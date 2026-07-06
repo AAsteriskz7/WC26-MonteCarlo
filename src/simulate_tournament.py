@@ -5,6 +5,7 @@ import itertools
 import random
 from pathlib import Path
 from collections import defaultdict #like a python dictionary  but more features
+from calculate_elo import calculate_k_factor, calculate_expected_scores, update_ratings
 
 # Goal: Simulate the 2026 World Cup 10,000 times using Monte Carlo simulation and trained Poisson models.
 
@@ -52,12 +53,94 @@ def get_current_elos(df): # function to extract elos of each team based on the g
             
     return latest_elos
 
+def get_post_match_elos(df):
+    """
+    FIX: get_current_elos returns the pre-match ELO of each team's most recent game,
+    meaning every team's rating is one game behind. This function computes the
+    actual post-match ELO by applying the K-factor update for that final match.
+    """
+    latest_dates = {}
+    latest_rows  = {}
+
+    for row in df.itertuples():
+        for team, elo_col, date in [
+            (row.home_team, 'home', row.date),
+            (row.away_team, 'away', row.date),
+        ]:
+            if team not in latest_dates or date > latest_dates[team]:
+                latest_dates[team] = date
+                latest_rows[team]  = (row, elo_col)
+
+    post_elos = {}
+    for team, (row, side) in latest_rows.items():
+        pre_elo_home = row.home_elo_pre
+        pre_elo_away = row.away_elo_pre
+        outcome      = getattr(row, 'match_outcome', None)
+        tournament   = getattr(row, 'tournament', 'Friendly')
+        neutral      = getattr(row, 'neutral', 1)
+
+        # If the match has no outcome (null score), fall back to pre-match ELO
+        if not outcome or pd.isna(outcome) or str(outcome) == 'nan':
+            post_elos[team] = pre_elo_home if side == 'home' else pre_elo_away
+            continue
+
+        k = calculate_k_factor(str(tournament))
+        expected_home, expected_away = calculate_expected_scores(
+            pre_elo_home, pre_elo_away, neutral
+        )
+        new_home, new_away = update_ratings(
+            pre_elo_home, pre_elo_away,
+            expected_home, expected_away,
+            outcome, k
+        )
+        post_elos[team] = new_home if side == 'home' else new_away
+
+    return post_elos
+
+def compute_wc_form_boost(df, alpha=4.0):
+    """
+    Compute a small ELO adjustment based on in-tournament World Cup 2026 performance.
+    Uses average goal difference per WC match as a proxy for current form/momentum.
+    alpha = ELO points per unit of average GD  (default: 4 pts per avg goal margin)
+
+    Example impact:
+      France  (avg GD ~+2.8 across 5 WC matches) → ~+11 ELO
+      Norway  (avg GD ~+0.7)                      → ~+3 ELO
+      Argentina (avg GD ~+1.2)                    → ~+5 ELO
+    """
+    wc_df = df[
+        (df['date'] >= pd.Timestamp('2026-06-11')) &
+        df['home_score'].notna() &
+        df['away_score'].notna()
+    ].copy()
+
+    goal_diff = defaultdict(float)
+    match_count = defaultdict(int)
+
+    for row in wc_df.itertuples():
+        h, a   = row.home_team, row.away_team
+        hs, as_ = int(row.home_score), int(row.away_score)
+        goal_diff[h]   += (hs - as_)
+        goal_diff[a]   += (as_ - hs)
+        match_count[h] += 1
+        match_count[a] += 1
+
+    boosts = {}
+    for team in goal_diff:
+        avg_gd = goal_diff[team] / max(match_count[team], 1)
+        boosts[team] = alpha * avg_gd   # can be negative (penalises poor form)
+
+    return boosts
+
 def _init_tournament_data():
     """Load all tournament data. Called lazily so bare imports don't trigger heavy I/O."""
     df = pd.read_csv(DATA_DIR / 'elo_results.csv', parse_dates=['date'])
     # Ensure date column is proper datetime (guards against Arrow/string backend)
     df['date'] = pd.to_datetime(df['date'])
-    _current_elos = get_current_elos(df)
+
+    # IMPROVEMENT 1: Use post-match ELOs so ratings reflect the outcome of each
+    # team's most recent game (not their ELO going *into* that game).
+    _current_elos = get_post_match_elos(df)
 
     try:
         mvi_df = pd.read_csv(DATA_DIR / 'squad_features.csv')
@@ -65,6 +148,10 @@ def _init_tournament_data():
     except FileNotFoundError:
         print("Warning: squad_features.csv not found. All MVIs will default to 1.0")
         _mvi_data = {}
+
+    # IMPROVEMENT 2: WC in-tournament form boost based on average goal difference.
+    # Rewards dominant teams (e.g. France) and penalises underperformers.
+    _wc_form_boosts = compute_wc_form_boost(df, alpha=4.0)
 
     # --- Tournament State Management (Match Overrides) ---
     _historical_matches = {}
@@ -76,17 +163,18 @@ def _init_tournament_data():
             _historical_matches[(row.home_team, row.away_team)] = (row.home_score, row.away_score)
             _historical_matches[(row.away_team, row.home_team)] = (row.away_score, row.home_score)
     # -----------------------------------------------------
-    return _current_elos, _mvi_data, _historical_matches
+    return _current_elos, _mvi_data, _historical_matches, _wc_form_boosts
 
 # Module-level state — initialized lazily on first use
 current_elos = None
 mvi_data = None
 historical_matches = None
+wc_form_boosts = None
 
 def _ensure_initialized():
-    global current_elos, mvi_data, historical_matches
+    global current_elos, mvi_data, historical_matches, wc_form_boosts
     if current_elos is None:
-        current_elos, mvi_data, historical_matches = _init_tournament_data()
+        current_elos, mvi_data, historical_matches, wc_form_boosts = _init_tournament_data()
 
 def simulate_match(team1, team2, is_knockout=False):
     _ensure_initialized()
@@ -100,12 +188,16 @@ def simulate_match(team1, team2, is_knockout=False):
         team1, team2 = team2, team1
         swapped = True
     
-    elo1_base = current_elos.get(team1, 1500.0) #sets default o 1500, shouldnt happen tho. 
+    # IMPROVEMENT 1: post-match ELOs (one full game more current than before)
+    elo1_base = current_elos.get(team1, 1500.0)
     elo2_base = current_elos.get(team2, 1500.0)
-    
 
-    # this is the calcaultions for the elo
-    #defualt is 1.0. max is 0.01
+    # IMPROVEMENT 2: WC form boost — rewards in-tournament goal dominance
+    elo1_base += wc_form_boosts.get(team1, 0.0)
+    elo2_base += wc_form_boosts.get(team2, 0.0)
+
+    # this is the calculations for the elo
+    # default is 1.0, min clamped at 0.01
     team1_mvi = max(float(mvi_data.get(team1, 1.0)), 0.01)
     team2_mvi = max(float(mvi_data.get(team2, 1.0)), 0.01)
     
